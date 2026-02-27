@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Seguro Multimedio</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        #chat-box { height: 300px; border: 1px solid #ccc; overflow-y: scroll; padding: 10px; margin-bottom: 10px;}
+        .msg { margin: 5px 0; padding: 5px; background: #eef; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <h2>Chat Seguro (Cifrado Extremo a Extremo)</h2>
+    
+    <div id="auth-section">
+        <input type="text" id="username" placeholder="Tu Nombre">
+        <input type="password" id="secret-key" placeholder="Clave secreta compartida del chat">
+        <button onclick="entrarChat()">Entrar al Chat</button>
+    </div>
+
+    <div id="chat-section" style="display:none;">
+        <div id="chat-box"></div>
+        
+        <input type="text" id="message" placeholder="Escribe un mensaje...">
+        <button onclick="sendMessage()">Enviar Mensaje</button>
+        
+        <hr>
+        
+        <input type="file" id="media-file">
+        <button onclick="sendMedia()">Enviar Multimedia</button>
+    </div>
+
+    <script>
+        const socket = io();
+        let myUsername = '';
+        let sharedSecretKey = '';
+
+        function entrarChat() {
+            myUsername = document.getElementById('username').value;
+            sharedSecretKey = document.getElementById('secret-key').value;
+            if(myUsername && sharedSecretKey) {
+                document.getElementById('auth-section').style.display = 'none';
+                document.getElementById('chat-section').style.display = 'block';
+            }
+        }
+
+        function encryptMessage(msg) {
+            return CryptoJS.AES.encrypt(msg, sharedSecretKey).toString();
+        }
+
+        function decryptMessage(cipherText) {
+            try {
+                const bytes = CryptoJS.AES.decrypt(cipherText, sharedSecretKey);
+                return bytes.toString(CryptoJS.enc.Utf8);
+            } catch (e) {
+                return "[Mensaje ilegible - Clave incorrecta]";
+            }
+        }
+
+        function sendMessage() {
+            const rawMessage = document.getElementById('message').value;
+            const encryptedMessage = encryptMessage(rawMessage);
+            
+            socket.emit('chat_message', { 
+                user: myUsername, 
+                text: encryptedMessage, 
+                type: 'text' 
+            });
+            document.getElementById('message').value = '';
+        }
+
+        async function sendMedia() {
+            const fileInput = document.getElementById('media-file');
+            if(fileInput.files.length === 0) return;
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            const response = await fetch('/upload', { method: 'POST', body: formData });
+            const data = await response.json();
+
+            const encryptedUrl = encryptMessage(data.url);
+
+            socket.emit('chat_message', { 
+                user: myUsername, 
+                text: encryptedUrl, 
+                type: 'image' 
+            });
+        }
+
+        socket.on('chat_message', (data) => {
+            const decryptedContent = decryptMessage(data.text);
+            const chatBox = document.getElementById('chat-box');
+            
+            if(!decryptedContent) return;
+
+            if(data.type === 'text') {
+                chatBox.innerHTML += `<div class="msg"><b>${data.user}:</b> ${decryptedContent}</div>`;
+            } else if (data.type === 'image') {
+                chatBox.innerHTML += `<div class="msg"><b>${data.user}:</b> <br> <img src="${decryptedContent}" width="150"></div>`;
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+    </script>
+</body>
+</html>
