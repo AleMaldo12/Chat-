@@ -3,38 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Seguro Multimedio</title>
-    
+    <title>SecureWeb | Comunicación Cifrada</title>
     <link rel="stylesheet" href="style.css">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    
     <script src="script.js" defer></script>
 </head>
 <body>
 
-    <div class="app-container">
-        <div class="header">Chat Seguro E2E</div>
-        
-        <div id="auth-section">
-            <input type="text" id="username" placeholder="Tu Nombre">
-            <input type="password" id="secret-key" placeholder="Clave secreta compartida">
-            <button onclick="entrarChat()">Entrar al Chat</button>
-        </div>
+    <nav class="navbar">
+        <div class="logo">Secure<span>Web</span></div>
+        <ul class="nav-links">
+            <li><a href="#">Inicio</a></li>
+            <li><a href="#chat-container">Chat</a></li>
+            <li><a href="#" onclick="alert('Funcionalidad de recuperación de cuenta')">Soporte</a></li>
+        </ul>
+    </nav>
 
-        <div id="chat-section" style="display:none;">
-            <div id="chat-box"></div>
+    <header class="hero">
+        <h1>Privacidad total en tus manos</h1>
+        <p>Chat con cifrado de extremo a extremo y gestión multimedia segura.</p>
+        <a href="#chat-container" class="btn-primary">Empezar a chatear</a>
+    </header>
+
+    <main class="main-content" id="chat-container">
+        <div class="chat-card">
+            <div class="chat-header">Sala de Chat Privada</div>
             
-            <div class="input-area">
-                <input type="file" id="media-file" style="display: none;" onchange="sendMedia()">
-                <button class="media-btn" onclick="document.getElementById('media-file').click()" title="Adjuntar multimedia">📎</button>
+            <div id="auth-section" class="auth-box">
+                <h3>Identifícate para entrar</h3>
                 
-                <input type="text" id="message" placeholder="Escribe un mensaje...">
-                <button onclick="sendMessage()">Enviar</button>
+                <div class="input-group-vertical">
+                    <input type="text" id="username" placeholder="Nombre de usuario">
+                    <input type="password" id="secret-key" placeholder="Clave de cifrado compartida">
+                </div>
+                <button class="login-btn" onclick="entrarChat()">Acceder al Chat</button>
+            </div>
+
+            <div id="chat-section" style="display:none;">
+                <div id="chat-box"></div>
+                <div class="input-area">
+                    <input type="file" id="media-file" style="display: none;" onchange="sendMedia()">
+                    <button class="icon-btn" onclick="document.getElementById('media-file').click()">📎</button>
+                    <input type="text" id="message" placeholder="Escribe un mensaje seguro...">
+                    <button class="send-btn" onclick="sendMessage()">Enviar</button>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 SecureWeb Project - Práctica de Seguridad Web</p>
+    </footer>
 
 </body>
 </html>

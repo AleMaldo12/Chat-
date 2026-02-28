@@ -2,7 +2,6 @@ const socket = io();
 let myUsername = '';
 let sharedSecretKey = '';
 
-// Función para ingresar al chat
 function entrarChat() {
     myUsername = document.getElementById('username').value.trim();
     sharedSecretKey = document.getElementById('secret-key').value.trim();
@@ -10,8 +9,13 @@ function entrarChat() {
     if(myUsername && sharedSecretKey) {
         document.getElementById('auth-section').style.display = 'none';
         document.getElementById('chat-section').style.display = 'flex';
+        // Scroll automático al entrar
+        setTimeout(() => {
+            const chatBox = document.getElementById('chat-box');
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }, 100);
     } else {
-        alert("Por favor, ingresa tu nombre y la clave secreta.");
+        alert("Introduce nombre y clave.");
     }
 }
 
