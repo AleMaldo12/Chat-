@@ -2,6 +2,43 @@ const socket = io();
 let myUsername = '';
 let sharedSecretKey = '';
 
+// Mostrar/Ocultar secciones
+function showRecovery() {
+    document.getElementById('auth-section').style.display = 'none';
+    document.getElementById('recovery-section').style.display = 'flex';
+}
+
+function hideRecovery() {
+    document.getElementById('recovery-section').style.display = 'none';
+    document.getElementById('auth-section').style.display = 'flex';
+}
+
+// Envío de petición al servidor
+async function sendRecoveryEmail() {
+    const email = document.getElementById('recovery-email').value;
+    
+    if (!email) {
+        return alert("Por favor, ingresa tu correo.");
+    }
+
+    try {
+        const response = await fetch('/forgot-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+
+        if (response.ok) {
+            alert("Si el correo está registrado, recibirás instrucciones en breve.");
+            hideRecovery();
+        } else {
+            alert("Hubo un error al procesar la solicitud.");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
 function entrarChat() {
     myUsername = document.getElementById('username').value.trim();
     sharedSecretKey = document.getElementById('secret-key').value.trim();

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SecureWeb | Comunicación Cifrada</title>
+    <title>SecureWeb | Sala Privada</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
@@ -15,29 +15,35 @@
         <div class="logo">Secure<span>Web</span></div>
         <ul class="nav-links">
             <li><a href="#">Inicio</a></li>
-            <li><a href="#chat-container">Chat</a></li>
-            <li><a href="#" onclick="alert('Funcionalidad de recuperación de cuenta')">Soporte</a></li>
+            <li><a href="#">Soporte</a></li>
         </ul>
     </nav>
 
-    <header class="hero">
-        <h1>Privacidad total en tus manos</h1>
-        <p>Chat con cifrado de extremo a extremo y gestión multimedia segura.</p>
-        <a href="#chat-container" class="btn-primary">Empezar a chatear</a>
-    </header>
-
-    <main class="main-content" id="chat-container">
+    <main class="main-content">
         <div class="chat-card">
             <div class="chat-header">Sala de Chat Privada</div>
-            
+
             <div id="auth-section" class="auth-box">
                 <h3>Identifícate para entrar</h3>
-                
-                <div class="input-group-vertical">
+                <div class="auth-fields">
                     <input type="text" id="username" placeholder="Nombre de usuario">
                     <input type="password" id="secret-key" placeholder="Clave de cifrado compartida">
+                    <button class="login-btn" onclick="entrarChat()">Acceder al Chat</button>
+        
+                    <p class="forgot-link">
+                        <a href="#" onclick="showRecovery()">¿No puedes entrar a tu cuenta?</a>
+                    </p>
                 </div>
-                <button class="login-btn" onclick="entrarChat()">Acceder al Chat</button>
+            </div>
+            
+            <div id="recovery-section" class="auth-box" style="display:none;">
+                <h3>Recuperar acceso</h3>
+                <p>Introduce tu correo para recibir un enlace de restablecimiento.</p>
+                <div class="auth-fields">
+                    <input type="email" id="recovery-email" placeholder="Correo electrónico">
+                    <button class="login-btn" onclick="sendRecoveryEmail()">Enviar enlace</button>
+                    <button class="btn-secondary" onclick="hideRecovery()">Volver al login</button>
+                </div>
             </div>
 
             <div id="chat-section" style="display:none;">
