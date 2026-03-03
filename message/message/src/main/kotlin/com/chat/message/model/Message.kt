@@ -10,12 +10,13 @@ data class Message(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column(nullable = false)
-    val senderId: String, // Aquí guardaremos el 'sub' del JWT (ID de Cognito)
+    @ManyToOne // Relación con la tabla User
+    @JoinColumn(name = "user_id", nullable = false)
+    val sender: User,
 
     @Column(nullable = false)
     val content: String,
 
     @Column(nullable = false)
-    val timestamp: LocalDateTime = LocalDateTime.now()
+    val timestamp: java.time.LocalDateTime = java.time.LocalDateTime.now()
 )
