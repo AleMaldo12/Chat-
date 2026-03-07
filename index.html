@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App - Registro y Mensajes</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 800px; margin: 20px auto; background-color: #f0f2f5; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        input { display: block; width: 95%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
+        button { background-color: #0084ff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #0073e6; }
+        #chat-box { height: 300px; border: 1px solid #eee; overflow-y: scroll; padding: 10px; background: #fafafa; margin-bottom: 10px; }
+        .message { background: #e4e6eb; padding: 8px 12px; border-radius: 15px; margin-bottom: 8px; width: fit-content; }
+        .author { font-size: 0.8em; font-weight: bold; color: #65676b; display: block; }
+        .status-msg { color: green; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="card" id="auth-section">
+        <h2>🔑 Autenticación (Cognito)</h2>
+        
+        <div id="register-ui">
+            <h3>Crear Cuenta</h3>
+            <input type="text" id="reg-nickname" placeholder="Nickname">
+            <input type="email" id="reg-email" placeholder="Correo Electrónico">
+            <input type="password" id="reg-password" placeholder="Contraseña">
+            <button onclick="handleRegister()">Registrarse</button>
+        </div>
+
+        <div id="confirm-ui" style="display:none;">
+            <h3>Verificar Código</h3>
+            <p>Ingresa el código enviado a tu correo:</p>
+            <input type="text" id="conf-code" placeholder="Código de 6 dígitos">
+            <button onclick="handleConfirm()">Confirmar Cuenta</button>
+        </div>
+
+        <div id="login-ui" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px;">
+            <h3>Iniciar Sesión</h3>
+            <input type="email" id="login-email" placeholder="Email">
+            <input type="password" id="login-password" placeholder="Contraseña">
+            <button onclick="handleLogin()">Entrar</button>
+            <p id="auth-status"></p>
+        </div>
+    </div>
+
+    <div class="card" id="chat-section" style="display:none;">
+        <h2>💬 Chat en Tiempo Real</h2>
+        <div id="chat-box"></div>
+        <div style="display: flex;">
+            <input type="text" id="msg-content" placeholder="Escribe un mensaje..." style="flex-grow: 1;">
+            <button onclick="handleSendMessage()" style="margin-left: 10px;">Enviar</button>
+        </div>
+        <button onclick="logout()" style="background-color: #888; margin-top: 10px;">Cerrar Sesión</button>
+    </div>
+
+    <script>
+        const API_BASE = "http://localhost:8080";
+        let userToken = null;
+
+        // 1. REGISTRO
+        async function handleRegister() {
+            const data = {
+                nickname: document.getElementById('reg-nickname').value,
+                email: document.getElementById('reg-email').value,
+                password: document.getElementById('reg-password').value
+            };
+            const res = await fetch(`${API_BASE}/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (res.ok) {
+                alert("Registro exitoso. Revisa tu email.");
+                document.getElementById('confirm-ui').style.display = 'block';
+            } else { alert("Error al registrar: " + await res.text()); }
+        }
+
+        // 2. CONFIRMACIÓN
+        async function handleConfirm() {
+    // IMPORTANTE: Para confirmar usamos el apodo (nickname) que se usó en el registro
+    const nickname = document.getElementById('reg-nickname').value; 
+    const code = document.getElementById('conf-code').value;
+
+    const res = await fetch(`${API_BASE}/auth/confirm`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            email: nickname, // <--- Aquí mandamos el nickname (ej: 'alemal')
+            confirmationCode: code 
+        })
+    });
+
+    if (res.ok) {
+        alert("¡Cuenta confirmada exitosamente! Ya puedes iniciar sesión con tu email.");
+        document.getElementById('confirm-ui').style.display = 'none';
+    } else {
+        const errorText = await res.text();
+        alert("Error en el código: " + errorText);
+    }
+}
+
+        // 3. LOGIN
+        async function handleLogin() {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+
+    const res = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, password: password })
+    });
+
+    if (res.ok) {
+        const data = await res.json();
+        userToken = data.token;
+        document.getElementById('auth-section').style.display = 'none';
+        document.getElementById('chat-section').style.display = 'block';
+        startChat();
+    } else {
+        const errorMsg = await res.text();
+        alert("Fallo en el login: " + errorMsg);
+    }
+}
+
+        // 4. CHAT
+        async function loadMessages() {
+            const res = await fetch(`${API_BASE}/messages/all`);
+            const messages = await res.json();
+            const box = document.getElementById('chat-box');
+            box.innerHTML = messages.map(m => `
+                <div class="message">
+                    <span class="author">${m.sender.nickname}</span>
+                    ${m.content}
+                </div>
+            `).join('');
+            box.scrollTop = box.scrollHeight;
+        }
+
+        async function handleSendMessage() {
+            const content = document.getElementById('msg-content').value;
+            if (!content) return;
+            const res = await fetch(`${API_BASE}/messages/send`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${userToken}` 
+                },
+                body: JSON.stringify({ content })
+            });
+            if (res.ok) {
+                document.getElementById('msg-content').value = '';
+                loadMessages();
+            }
+        }
+
+        function startChat() {
+            loadMessages();
+            setInterval(loadMessages, 3000);
+        }
+
+        function logout() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
