@@ -1,9 +1,9 @@
 package com.chat.message.service
 
-import UserRepository
 import com.chat.message.model.Message
 import com.chat.message.model.User
 import com.chat.message.repository.MessageRepository
+import com.chat.message.repository.UserRepository
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Service
 

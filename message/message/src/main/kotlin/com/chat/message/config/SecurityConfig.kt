@@ -8,23 +8,20 @@ import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig {
+open class SecurityConfig {
 
     @Bean
-    fun filterChain(http: HttpSecurity): SecurityFilterChain {
+    open fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .csrf { it.disable() }
             .authorizeHttpRequests { auth ->
-                // Las rutas de auth (login, register) deben ser públicas
-                auth.requestMatchers("/auth/**").permitAll()
-                // CUALQUIER otra ruta (como enviar mensajes) requerirá el Token
-                auth.anyRequest().authenticated()
+                auth
+                    .requestMatchers("/messages/send").authenticated() // Protegemos el envío
+                    .anyRequest().permitAll()
             }
             .oauth2ResourceServer { oauth2 ->
-                // Esto activa el filtro que lee el "Bearer <token>"
-                oauth2.jwt { }
+                oauth2.jwt { } // Habilita la validación de tokens JWT
             }
-
         return http.build()
     }
 }

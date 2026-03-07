@@ -1,6 +1,10 @@
 package com.chat.message.controller
 
+import com.chat.message.dto.MessageRequest
 import com.chat.message.model.Message
+import com.chat.message.model.User
+import com.chat.message.repository.MessageRepository
+import com.chat.message.repository.UserRepository
 import com.chat.message.service.MessageService
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -9,27 +13,37 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/messages")
-class MessageController(
-    // ESTO ES LO QUE FALTABA: Inyectar el servicio aquí
-    private val messageService: MessageService
+open class MessageController(
+    private val userRepository: UserRepository,
+    private val messageRepository: MessageRepository
 ) {
 
     @PostMapping("/send")
-    fun sendMessage(
-        @AuthenticationPrincipal jwt: Jwt,
-        @RequestBody body: Map<String, String>
-    ): ResponseEntity<Message> {
-        val content = body["content"] ?: return ResponseEntity.badRequest().build()
+    open fun sendMessage(
+        @RequestBody payload: MessageRequest,
+        @AuthenticationPrincipal jwt: Jwt // Extrae el token validado por Spring
+    ) {
+        // 1. Obtenemos el ID único de Cognito (sub)
+        val cognitoId = jwt.subject
 
-        // jwt.subject es el ID único de Cognito (sub)
-        val senderId = jwt.subject
+        // 2. Buscamos al usuario en RDS. Si no existe, lo creamos con datos del token.
+        val user = userRepository.findById(cognitoId).orElseGet {
+            val newUser = User(
+                id = cognitoId,
+                nickname = jwt.getClaimAsString("nickname") ?: "Usuario_Cognito",
+                email = jwt.getClaimAsString("email") ?: ""
+            )
+            userRepository.save(newUser)
+        }
 
-        val savedMessage = messageService.saveMessage(senderId, content)
-        return ResponseEntity.ok(savedMessage)
+        // 3. Guardamos el mensaje
+        val message = Message(
+            content = payload.content,
+            sender = user
+        )
+        messageRepository.save(message)
     }
 
     @GetMapping("/all")
-    fun getAllMessages(): ResponseEntity<List<Message>> {
-        return ResponseEntity.ok(messageService.getAllMessages())
-    }
+    open fun getAllMessages(): List<Message> = messageRepository.findAll()
 }
