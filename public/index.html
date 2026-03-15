@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureWeb | Sala Privada</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js" defer></script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">Secure<span>Web</span></div>
+        <ul class="nav-links">
+            <li><a href="#">Inicio</a></li>
+            <li><a href="#">Soporte</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <div class="chat-card">
+            <div class="chat-header">Sala de Chat Privada</div>
+
+            <div id="auth-section" class="auth-box">
+                <h3>Identifícate para entrar</h3>
+                <div class="auth-fields">
+                    <input type="text" id="username" placeholder="Nombre de usuario">
+                    <input type="password" id="secret-key" placeholder="Clave de cifrado compartida">
+                    <button class="login-btn" onclick="entrarChat()">Acceder al Chat</button>
+        
+                    <p class="forgot-link">
+                        <a href="#" onclick="showRecovery()">¿No puedes entrar a tu cuenta?</a>
+                    </p>
+                </div>
+            </div>
+            
+            <div id="recovery-section" class="auth-box" style="display:none;">
+                <h3>Recuperar acceso</h3>
+                <p>Introduce tu correo para recibir un enlace de restablecimiento.</p>
+                <div class="auth-fields">
+                    <input type="email" id="recovery-email" placeholder="Correo electrónico">
+                    <button class="login-btn" onclick="sendRecoveryEmail()">Enviar enlace</button>
+                    <button class="btn-secondary" onclick="hideRecovery()">Volver al login</button>
+                </div>
+            </div>
+
+            <div id="chat-section" style="display:none;">
+                <div id="chat-box"></div>
+                <div class="input-area">
+                    <input type="file" id="media-file" style="display: none;" onchange="sendMedia()">
+                    <button class="icon-btn" onclick="document.getElementById('media-file').click()">📎</button>
+                    <input type="text" id="message" placeholder="Escribe un mensaje seguro...">
+                    <button class="send-btn" onclick="sendMessage()">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 SecureWeb Project - Práctica de Seguridad Web</p>
+    </footer>
+
+</body>
+</html>

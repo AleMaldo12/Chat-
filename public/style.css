@@ -1,0 +1,162 @@
+:root {
+    --primary: #128c7e;    /* Verde WhatsApp/SecureWeb */
+    --background: #d9dbd5; /* Fondo beige suave */
+    --card-bg: #ffffff;
+    --text-dark: #333;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: var(--background);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Navbar */
+.navbar {
+    background: #ffffff;
+    padding: 1rem 10%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.logo { font-size: 1.5rem; font-weight: bold; color: #128c7e; }
+.logo span { color: #075e54; }
+.nav-links { list-style: none; display: flex; gap: 20px; }
+.nav-links a { text-decoration: none; color: #555; font-weight: 500; }
+
+/* Main Content - Centrado total sin Hero */
+.main-content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+/* Chat Card - Ampliada */
+.chat-card {
+    width: 100%;
+    max-width: 900px; /* Más ancha que antes */
+    height: 700px;    /* Más alta para mejor lectura */
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    background: var(--primary);
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Auth Section (Login) */
+.auth-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    text-align: left;
+}
+
+.auth-box h3 {
+    margin-bottom: 25px;
+    color: #444;
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-fields input {
+    padding: 14px 18px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: 0.3s;
+}
+
+.auth-fields input:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 5px rgba(18, 140, 126, 0.2);
+}
+
+.login-btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+    align-self: flex-start; /* Como en la imagen, alineado a la izquierda */
+    transition: 0.2s;
+}
+
+.login-btn:hover { background-color: #0c6b5d; }
+
+/* Área de Mensajes */
+#chat-box {
+    flex: 1;
+    background: #efe7dd; /* Color de fondo de chat real */
+    padding: 25px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Footer */
+.footer {
+    padding: 20px;
+    text-align: center;
+    background: #f0f0f0;
+    color: #777;
+    font-size: 0.9rem;
+}
+
+.forgot-link {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.forgot-link a {
+    color: #075e54;
+    text-decoration: none;
+}
+
+.btn-secondary {
+    background: none;
+    border: 1px solid #ccc;
+    color: #666;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.btn-secondary:hover {
+    background: #f9f9f9;
+}
