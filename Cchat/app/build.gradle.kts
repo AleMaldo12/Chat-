@@ -52,4 +52,7 @@ dependencies {
 
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    // Librería oficial de Google para biometría (Huella/Facial)
+    implementation("androidx.biometric:biometric:1.1.0")
 }
